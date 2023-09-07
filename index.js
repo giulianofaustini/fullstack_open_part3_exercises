@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 let persons = [
   {
@@ -27,10 +27,6 @@ let persons = [
 ];
 
 const howMany = () => persons.length;
-
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World!</h1>");
-});
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
@@ -71,17 +67,25 @@ const generatedId = () => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-  if (!body.name && !body.number) {
+  if (!body.name || !body.number) {
     return response.status(400).json({
-      error: "content is missing",
+      error: "You need to provide their name and their phone number.",
     });
   }
+  const nameToAdd = persons.some((person) => person.name === body.name);
+
+  if (nameToAdd) {
+    return response.status(400).json({
+      error: "The name is already present in the phone number.",
+    });
+  }
+
   const person = {
     id: generatedId(),
     name: body.name,
-    number: body.number
+    number: body.number,
   };
-  console.log(person)
+  console.log(person);
   persons.push(person);
   response.json(person);
 });
