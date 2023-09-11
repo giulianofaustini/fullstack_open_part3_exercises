@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for hidden-leaf-8317 on 2023-09-10T17:06:43+03:00
+# fly.toml app configuration file generated for blue-star-6947 on 2023-09-11T08:20:33+03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "https://hidden-leaf-8317.fly.dev/"
+app = "blue-star-6947"
 primary_region = "arn"
 
 [build]
