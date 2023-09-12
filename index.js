@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
+const Person = require("./models/person");
 
 app.use(express.static("build"));
 app.use(cors());
@@ -44,17 +46,24 @@ let persons = [
 const howMany = () => persons.length;
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((person) => {
+    response.json(person);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching person by ID:", error);
+      response.status(500).json({ error: "Internal Server Error" });
+    });
 });
 
 app.get("/info", (request, response) => {
@@ -95,17 +104,20 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const person = {
-    id: generatedId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
-  console.log(person);
-  persons.push(person);
-  response.json(person);
+  });
+
+  // console.log(person);
+
+  person.save().then((savedPerson) => {
+    persons.push(savedPerson);
+    response.json(savedPerson);
+  });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

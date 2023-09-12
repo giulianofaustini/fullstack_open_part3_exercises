@@ -20,6 +20,7 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema);
 
 
+
 async function main() {
   try {
     await mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
