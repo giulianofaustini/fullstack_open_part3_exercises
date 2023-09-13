@@ -58,13 +58,39 @@ app.get("/api/persons/:id", (request, response) => {
         response.json(person);
       } else {
         response.status(404).end();
+        console.error("Error fetching person by ID. Insert the right ID number.");
       }
     })
     .catch((error) => {
       console.error("Error fetching person by ID:", error);
-      response.status(500).json({ error: "Internal Server Error" });
+      response.status(500).json({ error: "Malformatted ID" });
     });
 });
+
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body;
+
+  const updatedPerson = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, updatedPerson, { new: true })
+    .then((updatedPerson) => {
+      if (updatedPerson) {
+        response.json(updatedPerson);
+      } else {
+        response.status(404).json({ error: 'Person not found' });
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating person:', error);
+      response.status(500).json({ error: 'Malformatted ID or server error' });
+    });
+});
+
+
 
 app.get("/info", (request, response) => {
   response
@@ -74,16 +100,31 @@ app.get("/info", (request, response) => {
     .end();
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const personToDelete = persons.find((person) => person.id === id);
-  if (!personToDelete) {
-    response.status(404).end();
-  } else {
-    persons = persons.filter((person) => person.id !== id);
-    response.status(204).end();
-  }
-});
+// app.delete("/api/persons/:id", (request, response) => {
+//   const id = Number(request.params.id);
+//   const personToDelete = persons.find((person) => person.id === id);
+//   if (!personToDelete) {
+//     response.status(404).end();
+//   } else {
+//     persons = persons.filter((person) => person.id !== id);
+//     response.status(204).end();
+//   }
+// });
+
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch((error) => {
+      console.error("Error deleting person by ID:", error);
+      response.status(500).json({ error: "Malformatted ID" });
+    });
+})
+
+
+
 const generatedId = () => {
   const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
   return maxId + 1;
