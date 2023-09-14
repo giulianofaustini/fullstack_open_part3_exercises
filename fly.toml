@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for blue-star-6947 on 2023-09-11T08:20:33+03:00
+# fly.toml app configuration file generated for misty-feather-7515 on 2023-09-14T18:40:36+03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "blue-star-6947"
-primary_region = "arn"
+app = "misty-feather-7515"
+primary_region = "lhr"
 
 [build]
 

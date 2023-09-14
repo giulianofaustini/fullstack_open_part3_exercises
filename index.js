@@ -20,6 +20,21 @@ morgan.token("requestBody", (req, res) => {
   }
 });
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(500).send({ error: "malformatted id" });
+    console.error(
+      "Error in middleware handler."
+    );
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
+
 let persons = [
   {
     id: 1,
@@ -51,24 +66,22 @@ app.get("/api/persons", (request, response) => {
   });
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   Person.findById(request.params.id)
     .then((person) => {
       if (person) {
         response.json(person);
       } else {
         response.status(404).end();
-        console.error("Error fetching person by ID. Insert the right ID number.");
+        console.error(
+          "Error fetching person by ID. Insert the right ID number."
+        );
       }
     })
-    .catch((error) => {
-      console.error("Error fetching person by ID:", error);
-      response.status(500).json({ error: "Malformatted ID" });
-    });
+    .catch((error) => next(error));
 });
 
-
-app.put('/api/persons/:id', (request, response, next) => {
+app.put("/api/persons/:id", (request, response, next) => {
   const body = request.body;
 
   const updatedPerson = {
@@ -81,16 +94,14 @@ app.put('/api/persons/:id', (request, response, next) => {
       if (updatedPerson) {
         response.json(updatedPerson);
       } else {
-        response.status(404).json({ error: 'Person not found' });
+        response.status(404).json({ error: "Person not found" });
       }
     })
     .catch((error) => {
-      console.error('Error updating person:', error);
-      response.status(500).json({ error: 'Malformatted ID or server error' });
+      console.error("Error updating person:", error);
+      response.status(500).json({ error: "Malformatted ID or server error" });
     });
 });
-
-
 
 app.get("/info", (request, response) => {
   response
@@ -111,19 +122,16 @@ app.get("/info", (request, response) => {
 //   }
 // });
 
-
-app.delete('/api/persons/:id', (request, response, next) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
-      response.status(204).end()
+    .then((result) => {
+      response.status(204).end();
     })
     .catch((error) => {
       console.error("Error deleting person by ID:", error);
       response.status(500).json({ error: "Malformatted ID" });
     });
-})
-
-
+});
 
 const generatedId = () => {
   const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
@@ -152,10 +160,16 @@ app.post("/api/persons", (request, response) => {
 
   // console.log(person);
 
-  person.save().then((savedPerson) => {
-    persons.push(savedPerson);
-    response.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      persons.push(savedPerson);
+      response.json(savedPerson);
+    })
+    .catch((error) => {
+      console.error("Error saving person:", error);
+      response.status(500).json({ error: "Internal server error" });
+    });
 });
 
 const PORT = process.env.PORT;
