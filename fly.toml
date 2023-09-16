@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for damp-night-5562 on 2023-09-16T11:15:54+03:00
+# fly.toml app configuration file generated for white-firefly-759 on 2023-09-16T12:00:19+03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "damp-night-5562"
+app = "white-firefly-759"
 primary_region = "arn"
 
 [build]
