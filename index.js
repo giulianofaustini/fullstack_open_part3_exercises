@@ -25,9 +25,6 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(500).send({ error: "malformatted id" });
-    console.error(
-      "Error in middleware handler."
-    );
   }
 
   next(error);
